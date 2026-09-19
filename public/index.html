@@ -121,14 +121,14 @@
   .hero::after{ content:""; position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(232,89,12,0.35), transparent 70%); pointer-events:none; }
   .hero-row{ display:flex; align-items:flex-start; justify-content:space-between; position:relative; z-index:1; gap:10px; }
   .hero-label{ font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#A6B6D2; margin:0 0 8px; }
-  .hero-balance{ font-size:46px; font-weight:700; line-height:1.05; letter-spacing:-0.02em; }
-  .hero-balance sup{ font-size:19px; font-weight:700; color:#A6B6D2; margin-right:3px; }
+  .hero-balance{ font-size:clamp(30px, 9vw, 46px); font-weight:700; line-height:1.05; letter-spacing:-0.02em; }
+  .hero-balance sup{ font-size:clamp(14px, 3.6vw, 19px); font-weight:700; color:#A6B6D2; margin-right:3px; }
   .hero-proj{ font-size:13px; color:#C0CBE0; font-weight:700; text-align:right; max-width:130px; line-height:1.4; }
   .hero-stats{ display:flex; gap:10px; margin-top:20px; position:relative; z-index:1; }
-  .hero-stat{ flex:1; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.09); border-radius:14px; padding:12px 13px; }
+  .hero-stat{ flex:1; min-width:0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.09); border-radius:14px; padding:12px 13px; }
   .hero-stat h4{ margin:0 0 4px; font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; display:flex; align-items:center; gap:5px; }
   .hero-stat h4.in{ color:#6DEBB1; } .hero-stat h4.out{ color:#FFA2AD; }
-  .hero-stat .v{ font-size:19px; font-weight:700; letter-spacing:-0.01em; }
+  .hero-stat .v{ font-size:clamp(13.5px, 4.2vw, 19px); font-weight:700; letter-spacing:-0.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
   /* ---------- Tabs ---------- */
   .tabs{ display:flex; gap:5px; background:var(--surface-2); border:1px solid var(--line); border-radius:14px; padding:5px; margin-bottom:18px; overflow-x:auto; }
@@ -142,10 +142,10 @@
   .section-head .link-btn{ font-size:13.5px; font-weight:700; color:var(--accent); cursor:pointer; background:none; border:none; padding:6px 0; }
 
   /* ---------- Donut charts ---------- */
-  .donut-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .donut-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); box-shadow:var(--shadow); padding:16px 14px 18px; display:flex; flex-direction:column; align-items:center; }
-  .donut-card h3{ margin:0 0 12px; font-size:13.5px; font-weight:800; color:var(--text-dim); text-align:center; }
-  .donut-wrap{ position:relative; width:150px; height:150px; }
+  .donut-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .donut-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); box-shadow:var(--shadow); padding:14px 10px 16px; display:flex; flex-direction:column; align-items:center; min-width:0; }
+  .donut-card h3{ margin:0 0 12px; font-size:12.5px; font-weight:800; color:var(--text-dim); text-align:center; }
+  .donut-wrap{ position:relative; width:150px; height:150px; max-width:100%; }
   .donut-wrap svg{ width:100%; height:100%; display:block; }
   .donut-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 8px; }
   .donut-center .dc-val{ font-size:17px; font-weight:800; letter-spacing:-0.01em; }
@@ -413,6 +413,33 @@
     #printArea{ padding:0; }
   }
 
+  /* ---------- paired-field rows (dates, etc.) ---------- */
+  .two-col-fields{ display:flex; gap:10px; min-width:0; }
+  .two-col-fields > .field{ min-width:0; }
+
+  /* ---------- small phones ---------- */
+  @media (max-width:400px){
+    body{ padding-inline:12px; }
+    .two-col-fields{ flex-direction:column; gap:0; }
+    .two-col-fields > .field{ flex:none; }
+    .hero{ padding:20px 16px 18px; }
+    .fx-card{ padding:15px 14px 16px; }
+    .fx-row{ gap:6px; }
+    .fx-field{ padding:9px 10px; }
+    .fx-field input{ font-size:15px; }
+    .fx-field .fx-sym{ font-size:13px; }
+    .fx-swap{ width:32px; height:32px; font-size:13px; }
+    .fx-rate-edit input{ width:58px; }
+    .progress-card-head{ flex-wrap:wrap; gap:6px; }
+    .progress-pct{ font-size:22px; }
+    .donut-card h3{ font-size:11.5px; }
+  }
+  @media (max-width:360px){
+    .brand-text p{ display:none; }
+    .status-dot span{ display:none; }
+    .test-badge{ padding:5px 8px; }
+  }
+
   /* ================= DESKTOP LAYOUT ================= */
   @media (min-width: 920px){
     body{ padding-inline:32px; padding-block:56px 64px; align-items:flex-start; }
@@ -643,7 +670,7 @@
       <div class="section-head"><h2 id="msFormTitle">Nueva meta</h2></div>
       <div class="card" style="padding:16px;">
         <div class="field"><label>Título de la meta</label><input type="text" id="msTitle" placeholder="Ej. Instalación de tuberías principales" maxlength="80"></div>
-        <div style="display:flex; gap:10px;">
+        <div class="two-col-fields">
           <div class="field" style="flex:1;"><label>Fecha de inicio</label><input type="date" id="msStart"></div>
           <div class="field" style="flex:1;"><label>Fecha objetivo</label><input type="date" id="msEnd"></div>
         </div>
@@ -819,7 +846,7 @@
         <option value="USD">$ Dólares (USD)</option>
       </select>
     </div>
-    <div style="display:flex; gap:10px;">
+    <div class="two-col-fields">
       <div class="field" style="flex:1;"><label>Fecha de inicio</label><input type="date" id="newProjStart"></div>
       <div class="field" style="flex:1;"><label>Fecha de finalización</label><input type="date" id="newProjEnd"></div>
     </div>
@@ -1071,8 +1098,9 @@
 
     var wrap = document.getElementById(svgElId);
     var legend = document.getElementById(legendElId);
-    var size = window.innerWidth>=920 ? 180 : 150;
-    var stroke = 20;
+    var vw = window.innerWidth;
+    var size = vw>=920 ? 180 : (vw<=360 ? 110 : (vw<=400 ? 126 : 150));
+    var stroke = size<=126 ? 14 : 20;
 
     var proj = currentProject();
     if(rows.length===0){
