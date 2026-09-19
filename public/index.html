@@ -78,7 +78,7 @@
     color:var(--text);
     font-family:'Manrope',system-ui,-apple-system,sans-serif;
     font-size:var(--fs-base); line-height:1.4;
-    padding-inline:20px; padding-block:28px 118px;
+    padding-inline:20px; padding-block:28px 132px;
     margin:0; min-height:100vh; box-sizing:border-box;
     display:flex; justify-content:center; align-items:flex-start;
   }
@@ -103,7 +103,7 @@
   .proj-btn{
     display:flex; align-items:center; gap:10px; width:100%;
     background:var(--surface); border:1.5px solid var(--line); border-radius:16px;
-    padding:12px 14px; margin-bottom:16px; cursor:pointer; box-shadow:var(--shadow);
+    padding:14px 16px; margin-bottom:16px; cursor:pointer; box-shadow:var(--shadow);
     text-align:left;
   }
   .proj-btn .swatch{ width:38px; height:38px; border-radius:11px; flex:none; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:800; color:#fff; }
@@ -125,7 +125,7 @@
   .hero-balance sup{ font-size:clamp(14px, 3.6vw, 19px); font-weight:700; color:#A6B6D2; margin-right:3px; }
   .hero-proj{ font-size:13px; color:#C0CBE0; font-weight:700; text-align:right; max-width:130px; line-height:1.4; }
   .hero-stats{ display:flex; gap:10px; margin-top:20px; position:relative; z-index:1; }
-  .hero-stat{ flex:1; min-width:0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.09); border-radius:14px; padding:12px 13px; }
+  .hero-stat{ flex:1; min-width:0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.09); border-radius:14px; padding:13px 15px; }
   .hero-stat h4{ margin:0 0 4px; font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; display:flex; align-items:center; gap:5px; }
   .hero-stat h4.in{ color:#6DEBB1; } .hero-stat h4.out{ color:#FFA2AD; }
   .hero-stat .v{ font-size:clamp(13.5px, 4.2vw, 19px); font-weight:700; letter-spacing:-0.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -143,7 +143,7 @@
 
   /* ---------- Donut charts ---------- */
   .donut-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .donut-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); box-shadow:var(--shadow); padding:14px 10px 16px; display:flex; flex-direction:column; align-items:center; min-width:0; }
+  .donut-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); box-shadow:var(--shadow); padding:16px 12px 18px; display:flex; flex-direction:column; align-items:center; min-width:0; }
   .donut-card h3{ margin:0 0 12px; font-size:12.5px; font-weight:800; color:var(--text-dim); text-align:center; }
   .donut-wrap{ position:relative; width:150px; height:150px; max-width:100%; }
   .donut-wrap svg{ width:100%; height:100%; display:block; }
@@ -204,7 +204,7 @@
   /* ---------- Movement list ---------- */
   .mv-day{ font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--text-faint); margin:20px 0 9px; }
   .mv-day:first-child{ margin-top:0; }
-  .mv-item{ display:flex; align-items:center; gap:12px; padding:13px 4px; border-bottom:1px solid var(--line); cursor:pointer; min-height:56px; }
+  .mv-item{ display:flex; align-items:center; gap:12px; padding:14px 6px; border-bottom:1px solid var(--line); cursor:pointer; min-height:56px; }
   .mv-item:last-child{ border-bottom:none; }
   .mv-icon{ width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex:none; font-size:18px; font-weight:800; }
   .mv-icon.income{ background:var(--income-soft); } .mv-icon.expense{ background:var(--expense-soft); }
@@ -344,7 +344,7 @@
   .cd-stat.total .val{ font-size:18px; }
 
   /* ---------- payment orders ---------- */
-  .order-card{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px 15px; margin-bottom:10px; box-shadow:var(--shadow); }
+  .order-card{ background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:15px 16px; margin-bottom:10px; box-shadow:var(--shadow); }
   .order-card.paid{ opacity:.7; }
   .order-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
   .order-concept{ font-size:15px; font-weight:800; }
@@ -422,10 +422,10 @@
     body{ padding-inline:16px; }
     .two-col-fields{ flex-direction:column; gap:0; }
     .two-col-fields > .field{ flex:none; }
-    .hero{ padding:20px 16px 18px; }
-    .fx-card{ padding:15px 14px 16px; }
-    .fx-row{ gap:6px; }
-    .fx-field{ padding:9px 10px; }
+    .hero{ padding:22px 18px 20px; }
+    .fx-card{ padding:17px 16px 18px; }
+    .fx-row{ gap:8px; }
+    .fx-field{ padding:11px 12px; }
     .fx-field input{ font-size:15px; }
     .fx-field .fx-sym{ font-size:13px; }
     .fx-swap{ width:32px; height:32px; font-size:13px; }
@@ -442,7 +442,7 @@
 
   /* ================= DESKTOP LAYOUT ================= */
   @media (min-width: 920px){
-    body{ padding-inline:40px; padding-block:64px 72px; align-items:flex-start; }
+    body{ padding-inline:40px; padding-block:64px 88px; align-items:flex-start; }
     .app{ max-width:1180px; display:grid; grid-template-columns:280px 1fr; gap:28px; align-items:start; }
     .topbar{ grid-column:1 / -1; margin-bottom:30px; padding-bottom:20px; }
     .proj-sidebar{ display:flex; flex-direction:column; gap:14px; position:sticky; top:24px; }
@@ -647,10 +647,10 @@
       </div>
 
       <div class="section-head" id="pendingOrdersHead" hidden><h2>Órdenes pendientes de pago</h2><button class="link-btn" data-goto="ordenes">Ver todas</button></div>
-      <div class="card" style="padding:6px 16px;" id="pendingOrdersPreview"></div>
+      <div class="card" style="padding:8px 18px;" id="pendingOrdersPreview"></div>
 
       <div class="section-head"><h2>Últimos movimientos</h2><button class="link-btn" data-goto="movimientos">Ver todos</button></div>
-      <div class="card" style="padding:6px 16px;" id="recentList"></div>
+      <div class="card" style="padding:8px 18px;" id="recentList"></div>
     </div>
 
     <!-- AVANCE -->
@@ -1271,7 +1271,7 @@
           ? '<button class="closed-badge" data-reopenday="'+date+'">🔒 Caja cerrada</button>'
           : '<button class="close-day-btn" data-closeday="'+date+'">Cerrar caja del día</button>');
       html += '<div class="day-head-row"><div class="mv-day">'+label+'</div>'+headRight+'</div>' +
-        '<div class="card" style="padding:2px 12px;">' +
+        '<div class="card" style="padding:6px 16px;">' +
         groups[date].map(function(m){
           return movItemHTML(m, { selectable: state.selectMode, checked: !!state.selectedIds[m.id] });
         }).join('') +
