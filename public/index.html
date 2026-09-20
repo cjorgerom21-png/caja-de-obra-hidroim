@@ -276,8 +276,16 @@
   .kind-pill.sel.in{ background:var(--income-soft); color:var(--income); border-color:transparent; }
   .kind-pill.sel.out{ background:var(--expense-soft); color:var(--expense); border-color:transparent; }
   .amt-input-wrap{ position:relative; }
-  .amt-input-wrap .cur{ position:absolute; left:14px; top:50%; transform:translateY(-50%); font-weight:700; color:var(--text-dim); font-size:15px; }
-  .amt-input-wrap input{ padding-left:38px; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:18px; }
+  .amt-input-wrap .cur{
+    position:absolute; left:8px; top:50%; transform:translateY(-50%); font-weight:800; color:var(--text-dim); font-size:13.5px;
+    background:var(--surface-3); border:none; border-radius:8px; padding:5px 8px; cursor:pointer; font-family:inherit; line-height:1;
+  }
+  .amt-input-wrap .cur:hover{ background:var(--surface); box-shadow:0 0 0 1px var(--line); }
+  .amt-input-wrap input{ padding-left:56px; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:18px; }
+  .cur-hint{ font-size:12px; font-weight:600; color:var(--text-faint); margin-top:6px; line-height:1.4; }
+  .cur-hint b{ color:var(--fx); font-weight:800; }
+  .fx-inline{ background:var(--fx-soft); border:1px solid transparent; border-radius:14px; padding:12px 14px 4px; margin-bottom:14px; }
+  .fx-inline-preview{ font-size:13px; font-weight:800; color:var(--fx); margin:0 0 10px; font-family:'JetBrains Mono',monospace; }
   .submit-btn{ width:100%; padding:15px; border-radius:14px; border:none; background:var(--accent-grad); color:var(--accent-ink); font-size:15.5px; font-weight:800; cursor:pointer; margin-top:8px; min-height:52px; box-shadow:0 8px 18px -8px rgba(232,89,12,0.5); }
   .submit-btn:disabled{ opacity:.5; cursor:not-allowed; }
   .del-mv-btn{ width:100%; padding:13px; border-radius:14px; border:1.5px solid var(--expense); background:none; color:var(--expense); font-size:14.5px; font-weight:800; cursor:pointer; margin-top:10px; min-height:48px; }
@@ -774,7 +782,15 @@
       <div class="kind-pill in" data-kind="income" id="pillIn">↓ Entrada</div>
       <div class="kind-pill out" data-kind="expense" id="pillOut">↑ Salida</div>
     </div>
-    <div class="field"><label id="mvAmountLabel">Monto (S/)</label><div class="amt-input-wrap"><span class="cur" id="mvCur">S/</span><input type="number" id="mvAmount" inputmode="decimal" placeholder="0.00" step="0.01" min="0"></div></div>
+    <div class="field">
+      <label id="mvAmountLabel">Monto (S/)</label>
+      <div class="amt-input-wrap"><button type="button" class="cur" id="mvCur" title="Toca para cambiar de moneda">S/</button><input type="number" id="mvAmount" inputmode="decimal" placeholder="0.00" step="0.01" min="0"></div>
+      <div class="cur-hint" id="mvCurHint" hidden>Se va a registrar en <b id="mvCurHintName">otra moneda</b> — toca "<span id="mvCurHintSym"></span>" para volver a la moneda del proyecto.</div>
+    </div>
+    <div class="fx-inline" id="mvFxGroup" hidden>
+      <div class="field" style="margin-bottom:8px;"><label>Tipo de cambio (1 $ = S/)</label><input type="number" id="mvFxRate" inputmode="decimal" step="0.001" min="0" placeholder="Ej. 3.75"></div>
+      <div class="fx-inline-preview" id="mvFxPreview">Equivale a —</div>
+    </div>
     <div class="field"><label>Categoría</label><select id="mvCategory"></select></div>
     <div class="field"><label>Descripción</label><input type="text" id="mvNote" placeholder="Ej. Válvulas HDPE 6''" maxlength="80"></div>
     <div class="field"><label>Fecha</label><input type="date" id="mvDate"></div>
@@ -1036,6 +1052,9 @@
   function fmt(n){ n=Number(n)||0; return n.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2}); }
   function curSym(proj){ return (proj && proj.currency==='USD') ? '$' : 'S/'; }
   function curFmt(proj, n){ return curSym(proj)+' '+fmt(n); }
+  function symFor(code){ return code==='USD' ? '$' : 'S/'; }
+  function nameFor(code){ return code==='USD' ? 'Dólares' : 'Soles'; }
+  function otherCur(code){ return code==='USD' ? 'PEN' : 'USD'; }
   function todayISO(){ var d=new Date(); var tz=d.getTimezoneOffset()*60000; return new Date(d-tz).toISOString().slice(0,10); }
   function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove('show');},2200); }
   function esc(s){ return (s||"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
@@ -1185,10 +1204,11 @@
   function updateAmountLabels(){
     var proj = currentProject();
     var sym = curSym(proj);
-    document.getElementById('mvCur').textContent = sym;
-    document.getElementById('mvAmountLabel').textContent = 'Monto ('+sym+')';
     document.getElementById('opCur').textContent = sym;
     document.getElementById('opAmountLabel').textContent = 'Monto ('+sym+')';
+    // mvCur / mvAmountLabel are managed by updateMvCurUI() while the movement
+    // sheet is open, since that field can be switched to the other currency.
+    if(overlay.hidden) updateMvCurUI();
   }
 
   function renderProjectMeta(){
@@ -1220,6 +1240,7 @@
     if(m.providerName) payBits.push(esc(m.providerName));
     if(m.payMethod) payBits.push(esc(m.payMethod));
     if(m.opNumber) payBits.push('N.º '+esc(m.opNumber));
+    if(m.fx && m.fx.currency) payBits.push('Pagado en '+symFor(m.fx.currency)+' '+fmt(m.fx.amount)+' (TC '+Number(m.fx.rate).toFixed(3)+')');
     var t2 = esc(c?c.name:'Sin categoría') + (payBits.length ? ' · '+payBits.join(' · ') : '');
     var testTag = m.isTest ? '<span class="test-tag">PRUEBA</span>' : '';
     var checkbox = opts.selectable
@@ -1655,11 +1676,61 @@
     setPayFieldsOpen(document.getElementById('payFields').hidden);
   });
 
+  // ---------- movement currency (registrar en otra moneda) ----------
+  function projCurCode(){ var proj = currentProject(); return (proj && proj.currency==='USD') ? 'USD' : 'PEN'; }
+  var mvEntryCurrency = 'PEN';
+  function updateMvCurUI(){
+    var projCur = projCurCode();
+    document.getElementById('mvCur').textContent = symFor(mvEntryCurrency);
+    document.getElementById('mvAmountLabel').textContent = 'Monto ('+symFor(mvEntryCurrency)+')';
+    var isForeign = mvEntryCurrency !== projCur;
+    document.getElementById('mvFxGroup').hidden = !isForeign;
+    var hint = document.getElementById('mvCurHint');
+    hint.hidden = !isForeign;
+    if(isForeign){
+      document.getElementById('mvCurHintName').textContent = nameFor(mvEntryCurrency);
+      document.getElementById('mvCurHintSym').textContent = symFor(projCur);
+      if(!document.getElementById('mvFxRate').value){
+        var savedRate = null;
+        try{ savedRate = parseFloat(localStorage.getItem('caja-obra-fx-rate')); }catch(e){}
+        document.getElementById('mvFxRate').value = (savedRate>0 ? savedRate : 3.75);
+      }
+      updateMvFxPreview();
+    }
+  }
+  function updateMvFxPreview(){
+    var proj = currentProject();
+    var projCur = projCurCode();
+    var entryAmount = parseFloat(document.getElementById('mvAmount').value);
+    var rate = parseFloat(document.getElementById('mvFxRate').value);
+    var el = document.getElementById('mvFxPreview');
+    if(!isFinite(entryAmount) || !isFinite(rate) || rate<=0){ el.textContent = 'Equivale a —'; return; }
+    var converted = projCur==='USD' ? (entryAmount/rate) : (entryAmount*rate);
+    el.textContent = 'Equivale a '+curFmt(proj, converted)+' (moneda del proyecto)';
+  }
+  document.getElementById('mvCur').addEventListener('click', function(){
+    var projCur = projCurCode();
+    mvEntryCurrency = (mvEntryCurrency===projCur) ? otherCur(projCur) : projCur;
+    if(mvEntryCurrency===projCur) document.getElementById('mvFxRate').value = '';
+    updateMvCurUI();
+  });
+  document.getElementById('mvAmount').addEventListener('input', updateMvFxPreview);
+  document.getElementById('mvFxRate').addEventListener('input', updateMvFxPreview);
+
   function openMvSheet(kind, movement){
     state.editingId = movement ? movement.id : null;
     document.getElementById('mvSheetTitle').textContent = movement ? 'Editar movimiento' : 'Nuevo movimiento';
     setMvKind(kind);
-    document.getElementById('mvAmount').value = movement ? movement.amount : '';
+    if(movement && movement.fx && movement.fx.currency){
+      mvEntryCurrency = movement.fx.currency;
+      document.getElementById('mvAmount').value = movement.fx.amount;
+      document.getElementById('mvFxRate').value = movement.fx.rate;
+    } else {
+      mvEntryCurrency = projCurCode();
+      document.getElementById('mvAmount').value = movement ? movement.amount : '';
+      document.getElementById('mvFxRate').value = '';
+    }
+    updateMvCurUI();
     document.getElementById('mvNote').value = movement ? (movement.note||'') : '';
     document.getElementById('mvDate').value = movement ? movement.date : todayISO();
     document.getElementById('mvPayMethod').value = movement ? (movement.payMethod||'') : '';
@@ -1678,7 +1749,7 @@
 
   document.getElementById('mvSubmit').addEventListener('click', function(){
     var kind = document.querySelector('.kind-pill.sel').dataset.kind;
-    var amount = parseFloat(document.getElementById('mvAmount').value);
+    var entryAmount = parseFloat(document.getElementById('mvAmount').value);
     var categoryId = document.getElementById('mvCategory').value;
     var note = document.getElementById('mvNote').value.trim();
     var date = document.getElementById('mvDate').value || todayISO();
@@ -1687,12 +1758,20 @@
     var opNumber = document.getElementById('mvOpNumber').value.trim();
     var providerId = document.getElementById('mvProvider').value;
     var extraNotes = document.getElementById('mvExtraNotes').value.trim();
-    if(!amount || amount<=0){ showToast('Ingresa un monto válido'); return; }
+    if(!entryAmount || entryAmount<=0){ showToast('Ingresa un monto válido'); return; }
     if(!categoryId){ showToast('Elige o crea una categoría primero'); return; }
     if(isDayClosed(state.currentProjectId, date)){ showToast('Ese día tiene la caja cerrada. Reábrela primero o elige otra fecha.'); return; }
+    var projCur = projCurCode();
+    var amount = entryAmount, fx = null;
+    if(mvEntryCurrency !== projCur){
+      var rate = parseFloat(document.getElementById('mvFxRate').value);
+      if(!rate || rate<=0){ showToast('Ingresa el tipo de cambio'); return; }
+      amount = Math.round((projCur==='USD' ? (entryAmount/rate) : (entryAmount*rate)) * 100) / 100;
+      fx = { currency: mvEntryCurrency, amount: entryAmount, rate: rate };
+    }
     var cat = catById(categoryId);
     var prov = providerId ? providerById(providerId) : null;
-    var data = { kind:kind, amount:amount, categoryId:categoryId, categoryName: cat?cat.name:'', note:note, date:date,
+    var data = { kind:kind, amount:amount, fx:fx, categoryId:categoryId, categoryName: cat?cat.name:'', note:note, date:date,
       payMethod:payMethod, bank:bank, opNumber:opNumber, providerId: providerId||'', providerName: prov?prov.name:'',
       extraNotes:extraNotes, projectId: state.currentProjectId, isTest: state.testMode };
     if(state.editingId){ updateMovement(state.editingId, data); } else { createMovement(data); }
